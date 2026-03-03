@@ -17,6 +17,12 @@ function processCommand(command) {
             process.exit(0);
             break;
         case 'show':
+            showTodos(findTodos);
+            break;
+        case 'important':
+            showTodos(findImportantTodos);
+            break;
+
 
         default:
             console.log('wrong command');
@@ -25,11 +31,33 @@ function processCommand(command) {
 }
 
 // TODO you can do it!
-function showTodos(filename){
-    let lines = readFile(filename).split('\n');
+function findTodos(file) {
+    let lines = file.split('\n');
+    let todos = []
     for (let line of lines) {
-        if (line.startsWith('// TODO ')){
-            return line.substring(8, line.length);
+        if (line.startsWith('// TODO ')) {
+            todos.push(line.substring(8, line.length));
+        }
+    }
+    return todos;
+}
+
+function findImportantTodos(file) {
+    let lines = file.split('\n');
+    let todos = []
+    for (let line of lines) {
+        if (line.startsWith('// TODO ') && line.includes('!')) {
+            todos.push(line.substring(8, line.length));
+        }
+    }
+    return todos;
+}
+
+function showTodos(finder) {
+    let files = getFiles();
+    for (let file of files) {
+        for (const todo of finder(file)) {
+            console.log(todo);
         }
     }
 }
