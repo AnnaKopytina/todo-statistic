@@ -46,10 +46,13 @@ function processCommand(command) {
 // TODO you can do it!
 function findTodos(file) {
     const lines = file.split('\n');
-    let todos = [];
+    let todos =[];
+    const regex = /\/\/\s*todo\s*:?\s*(.*)/i;
+
     for (const line of lines) {
-        if (line.startsWith('// TODO ')) {
-            todos.push(line.substring(8, line.length));
+        const match = line.match(regex);
+        if (match) {
+            todos.push(match[1].trim());
         }
     }
     return todos;
