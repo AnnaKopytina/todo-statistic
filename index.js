@@ -31,6 +31,12 @@ function processCommand(command) {
         case 'sort':
             showSortedTodos(param);
             break;
+        case 'date':
+            const dateRegex = /^\d{4}(-\d{2}(-\d{2})?)?$/;
+            if (param && dateRegex.test(param)) {
+                showTodos((file) => findDateTodos(file, param));
+            }
+            break;
         default:
             console.log('wrong command');
             break;
@@ -39,9 +45,9 @@ function processCommand(command) {
 
 // TODO you can do it!
 function findTodos(file) {
-    let lines = file.split('\n');
-    let todos =[];
-    for (let line of lines) {
+    const lines = file.split('\n');
+    let todos = [];
+    for (const line of lines) {
         if (line.startsWith('// TODO ')) {
             todos.push(line.substring(8, line.length));
         }
@@ -92,8 +98,8 @@ function showSortedTodos(sortType) {
 
     if (sortType === 'importance') {
         todos.sort((a, b) => {
-            const aExclamations = (a.match(/!/g) ||[]).length;
-            const bExclamations = (b.match(/!/g) ||[]).length;
+            const aExclamations = (a.match(/!/g) || []).length;
+            const bExclamations = (b.match(/!/g) || []).length;
             return bExclamations - aExclamations; // По убыванию
         });
     } else if (sortType === 'user') {
@@ -134,4 +140,22 @@ function showSortedTodos(sortType) {
     for (const todo of todos) {
         console.log(todo);
     }
+}
+
+function findDateTodos(file, dateArg) {
+    let todos = findTodos(file);
+    let dateTodos =[];
+    const targetTime = new Date(dateArg).getTime();
+
+    for (const todo of todos) {
+        let parts = todo.split(';');
+        if (parts.length >= 3) {
+            let todoDateStr = parts[1].trim();
+            let todoTime = new Date(todoDateStr).getTime();
+            if (!isNaN(todoTime) && todoTime >= targetTime) {
+                dateTodos.push(todo);
+            }
+        }
+    }
+    return dateTodos;
 }
